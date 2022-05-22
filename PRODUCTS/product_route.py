@@ -59,10 +59,9 @@ def get_product_category(prod_category):
 
 
 #GET ALL PRODUCTS IN A PARTICULAR PRICE RANGE
-@app.route('/price_filter', methods=['GET'])
-def prod_by_price_filter():
-    data=request.get_json()
-    prod=session.query(prods).filter(prods.prod_price.between(data['low_price'],data['high_price'])).order_by(prods.prod_price.asc()).all()
+@app.route('/price_filter/<int:low_price>/<int:high_price>', methods=['GET'])
+def prod_by_price_filter(low_price,high_price):
+    prod=session.query(prods).filter(prods.prod_price.between(low_price,high_price)).order_by(prods.prod_price.asc()).all()
     output = []
     for product in prod:
         prod_data = {}
@@ -73,15 +72,14 @@ def prod_by_price_filter():
         prod_data['prod_rating'] = product.prod_rating
         output.append(prod_data)
 
-    response = jsonify({'prods' : output})
+    response = jsonify({'PRODUCTS' : output})
     return response
 
 
 #GET ALL PRODUCTS SORTED BY RATING
-@app.route('/sort_by_rating', methods=['GET'])
-def sort_by_rating():
-    data=request.get_json()
-    prod=session.query(prods).filter(prods.prod_category==data['prod_category']).order_by(prods.prod_rating.desc()).all()
+@app.route('/sort_by_rating/<prod_category>', methods=['GET'])
+def sort_by_rating(prod_category):
+    prod=session.query(prods).filter(prods.prod_category==prod_category).order_by(prods.prod_rating.desc()).all()
     output = []
     for product in prod:
         prod_data = {}
@@ -92,14 +90,13 @@ def sort_by_rating():
         prod_data['prod_rating'] = product.prod_rating
         output.append(prod_data)
 
-    response = jsonify({'prods' : output})
+    response = jsonify({'PRODUCTS' : output})
     return response
 
 #GET ALL PRODUCTS SORTED BY PRICE
-@app.route('/sort_by_price', methods=['GET'])
-def sort_by_price():
-    data=request.get_json()
-    prod=session.query(prods).filter(prods.prod_category==data['prod_category']).order_by(prods.prod_price.desc()).all()
+@app.route('/sort_by_price/<prod_category>', methods=['GET'])
+def sort_by_price(prod_category):
+    prod=session.query(prods).filter(prods.prod_category==prod_category).order_by(prods.prod_price.desc()).all()
     output = []
     for product in prod:
         prod_data = {}

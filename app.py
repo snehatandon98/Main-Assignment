@@ -34,7 +34,7 @@ def token_required(f):
 
     return decorated
 
-#ADD USER
+#ADD USER IN DATABASE
 @app.route('/register', methods=['POST'])
 def register_user():
 
@@ -70,7 +70,7 @@ def login():
 
     return response
 
-#UPDATE PASSWORD
+#UPDATE PASSWORD IN DATABASE
 @app.route('/update_password', methods=['PUT'])
 @token_required
 def update_password(current_user):
@@ -81,7 +81,7 @@ def update_password(current_user):
     response  = jsonify({'message' : 'Password updated successfully!'})
     return response
 
-#DELETE USER
+#DELETE USER FROM DATABASE
 @app.route('/delete_user', methods=['DELETE'])
 def delete_user():
     data=request.get_json()
@@ -124,7 +124,6 @@ def add_to_cart(current_user):
         res=jsonify({'message' : 'Quantity not available!!'})
         return res
 
-
 #VIEW ALL PRODUCTS IN THE CART
 @app.route('/view_cart', methods=['GET'])
 @token_required
@@ -133,6 +132,38 @@ def view_cart(current_user):
     res = requests.get('http://127.0.0.1:5002/get_cart_details/' + user_id )
     return res.json()
 
+#GET ALL PRODUCTS BETWEEN PARTICULAR PRICE RANGE
+@app.route('/price_filter', methods=['GET'])
+@token_required
+def prod_by_price_filter(current_user):
+    data = request.get_json()
+    url_str = str(data['low_price']) + "/" + str(data['high_price'])
+    res=requests.get('http://127.0.0.1:5001/price_filter/' + url_str)
+    return res.json()
+
+#GET ALL PRODUCTS SORTED BY RATING
+@app.route('/prod_sorted_by_rating', methods=['GET'])
+@token_required
+def prod_sorted_by_rating(current_user):
+    data = request.get_json()
+    res=requests.get('http://127.0.0.1:5001/sort_by_rating/' + data['prod_category'])
+    return res.json()
+
+#GET ALL PRODUCTS SORTED BY PRICE
+@app.route('/prod_sorted_by_price', methods=['GET'])
+@token_required
+def prod_sorted_by_price(current_user):
+    data = request.get_json()
+    res=requests.get('http://127.0.0.1:5001/sort_by_price/' + data['prod_category'])
+    return res.json()
+
+#GET ALL PRODUCTS UNDER A PARTICULAR CATEGORY
+@app.route('/get_product_by_category', methods=['GET'])
+@token_required
+def get_product_by_category(current_user):
+    data = request.get_json()
+    res=requests.get('http://127.0.0.1:5001/get_product/' + data['prod_category'])
+    return res.json()
 
 #UPDATE PRODUCT QUANTITY IN CART
 @app.route('/update_prod_quantity',methods=['PUT'])
@@ -152,7 +183,7 @@ def update_prod_quantity(current_user):
         res=jsonify({'message' : 'Quantity not available!!'})
         return res
 
-#DELETES A PRODUCT FROM CART
+#DELETE A PRODUCT FROM THE CART
 @app.route('/delete_from_cart',methods=['DELETE'])
 @token_required
 def delete_from_cart(current_user):
