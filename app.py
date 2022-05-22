@@ -97,11 +97,15 @@ def delete_user():
         response = jsonify({'message':'Some error occured!!!'})
         
     return response
+
+#VIEW ALL PRODUCTS ON THE APP
 @app.route('/view_products',methods = ['GET'])
 @token_required
 def view_products():
     res = requests.get('http://127.0.0.1:5001/get_product')
     return res.json()
+
+#ADD PRODUCT TO THE CART
 @app.route('/add_to_cart',methods=['POST'])
 @token_required
 def add_to_cart(current_user):
@@ -120,6 +124,8 @@ def add_to_cart(current_user):
         res=jsonify({'message' : 'Quantity not available!!'})
         return res
 
+
+#VIEW ALL PRODUCTS IN THE CART
 @app.route('/view_cart', methods=['GET'])
 @token_required
 def view_cart(current_user):
@@ -128,6 +134,7 @@ def view_cart(current_user):
     return res.json()
 
 
+#UPDATE PRODUCT QUANTITY IN CART
 @app.route('/update_prod_quantity',methods=['PUT'])
 @token_required
 def update_prod_quantity(current_user):
@@ -145,6 +152,7 @@ def update_prod_quantity(current_user):
         res=jsonify({'message' : 'Quantity not available!!'})
         return res
 
+#DELETES A PRODUCT FROM CART
 @app.route('/delete_from_cart',methods=['DELETE'])
 @token_required
 def delete_from_cart(current_user):
@@ -154,6 +162,8 @@ def delete_from_cart(current_user):
     res=requests.delete('http://127.0.0.1:5002/remove_item/' + user_id + "/" + item_name)
     return res.json()
 
+
+#CHECKOUT AND MAKE PAYMENT
 @app.route('/checkout', methods=['POST'])
 @token_required
 def checkout(current_user):
@@ -179,12 +189,6 @@ def checkout(current_user):
             res1=requests.put('http://127.0.0.1:5001/update_quantity/' + str1)
             res2=requests.delete('http://127.0.0.1:5002/remove_item/' + user_id + "/" + item_name)
     return res.json() 
-    #return jsonify(url_str)
-
-
-
-
-
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)
