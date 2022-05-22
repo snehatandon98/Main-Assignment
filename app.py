@@ -173,7 +173,7 @@ def checkout(current_user):
     url_str=user_id + "/" + prod_names + "/" + prod_quantity + "/" + str(int(amt))
     res=requests.post('http://127.0.0.1:5003/checkout/' + url_str)  
     if res:
-        for item in cart:
+        for item in cart :
             item_name=item['item_name']
             str1=item['item_name'] + "/" + str(item['item_quantity'])
             res1=requests.put('http://127.0.0.1:5001/update_quantity/' + str1)
