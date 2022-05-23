@@ -101,7 +101,7 @@ def delete_user():
 #VIEW ALL PRODUCTS ON THE APP
 @app.route('/view_products',methods = ['GET'])
 @token_required
-def view_products():
+def view_products(current_user):
     res = requests.get('http://127.0.0.1:5001/get_product')
     return res.json()
 
