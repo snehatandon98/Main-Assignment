@@ -58,6 +58,9 @@ def update_quantity(user_id,item_name,quantity):
 def get_cart_details(user_id):
     try:
         cart=session.query(items).filter(items.user_id==user_id).all()
+        if not cart:
+            response = jsonify({'message' : 'CART is EMPTY!!!'})
+            return response
         output=[]
         sum=0
         for item in cart:

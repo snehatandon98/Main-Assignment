@@ -7,7 +7,7 @@ class Purchased(base):
 
     invoice_id = Column(String, primary_key=True)
     user_id = Column(String, nullable=False)
-    prod_name = Column(String, nullable = False, unique=True)
+    prod_name = Column(String, nullable = False)
     prod_quantity=Column(String,nullable=False)
     total_amount_paid = Column(Integer, nullable=False)
 

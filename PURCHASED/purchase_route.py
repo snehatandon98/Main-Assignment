@@ -16,9 +16,10 @@ def checkout(user_id,prod_name,prod_quantity,amount):
     try:
         session.add(invoice)
         session.commit()
-        response  = jsonify({'message' : 'Invoice added!'})
+        response  = jsonify({'message' : 'Invoice added!'}) 
     except:
         response = jsonify({'message' : 'Some error Occured!!!'})
+        response.status_code=401
     return response
 
 if __name__ == '__main__':

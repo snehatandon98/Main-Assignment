@@ -3,15 +3,18 @@ import uuid
 import datetime
 import config
 import requests
+import logging
 from config import session
 from model import Credentials as users
-from flask import Flask, request, jsonify, make_response, Response
+from flask import Flask, request, jsonify, make_response
 from functools import wraps
 
 session=session()
 
 app = Flask(__name__)
 app.config['SECRET_KEY']=config.SECRET_KEY
+
+logging.basicConfig(level=logging.INFO)
 
 def token_required(f):
     @wraps(f)
@@ -45,6 +48,7 @@ def register_user():
     session.commit()
 
     response  = jsonify({'message' : 'New user created!'})
+    logging.info('User successfully registered!!')
     return response
 
 #LOGIN
@@ -61,13 +65,15 @@ def login():
 
     if not user:
         response = make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
+        logging.info('LOGIN FAILED!!!')
         return response
     if (user.password==password):
         token = jwt.encode({'user_id' : user.user_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=120)}, app.config['SECRET_KEY'])
         response = jsonify({'token' : token})
+        logging.info('Login Successful!!')
     else:
         response = jsonify({'message' : 'Invalid Password!'})
-
+        logging.info('Invalid password, login attempt failed!!!')
     return response
 
 #UPDATE PASSWORD IN DATABASE
@@ -79,6 +85,7 @@ def update_password(current_user):
     current_user.password=data['password']
     session.commit()
     response  = jsonify({'message' : 'Password updated successfully!'})
+    logging.info('User password updated Successfuly!!')
     return response
 
 #DELETE USER FROM DATABASE
@@ -93,7 +100,7 @@ def delete_user():
         session.delete(user)
         session.commit()
         response= jsonify({'message' : 'User has been deleted!'})
-    except Exception as error:
+    except:
         response = jsonify({'message':'Some error occured!!!'})
         
     return response
@@ -201,8 +208,12 @@ def checkout(current_user):
     user_id=current_user.user_id
     details=requests.get('http://127.0.0.1:5002/get_cart_details/' + user_id)
     cart_details=details.json()
+    if 'ITEMS' not in cart_details.keys() :
+        return cart_details
     amt=cart_details['Total Amount']
     cart=cart_details['ITEMS']
+    if len(cart)==0:
+        return details.json()
     discount=config.DISCOUNT
     prod_names=""
     prod_quantity=""
@@ -213,7 +224,8 @@ def checkout(current_user):
         prod_quantity+=str(item['item_quantity']) + ","
     url_str=user_id + "/" + prod_names + "/" + prod_quantity + "/" + str(int(amt))
     res=requests.post('http://127.0.0.1:5003/checkout/' + url_str)  
-    if res:
+
+    if res.status_code==200:
         for item in cart :
             item_name=item['item_name']
             str1=item['item_name'] + "/" + str(item['item_quantity'])
